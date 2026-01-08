@@ -2,12 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginInput } from '@/lib/validators';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
-import Link from 'next/link';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,60 +42,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-xl shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 dark:bg-slate-950">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-500">Welcome back</p>
+          <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">
+            Sign in to your account
+          </h1>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Or{' '}
-            <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <Link href="/register" className="font-semibold text-indigo-600 dark:text-indigo-400">
               create a new account
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email address</label>
-              <input
-                {...register('email')}
-                type="email"
-                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
-                placeholder="Email address"
-              />
-              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
-            </div>
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                {...register('password')}
-                type="password"
-                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
-                placeholder="Password"
-              />
-              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
-            </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
+        <Card className="space-y-6">
+          {error ? (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-200">
+              {error}
+            </div>
+          ) : null}
+
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+            <Input
+              label="Email address"
+              type="email"
+              placeholder="Enter your email"
+              error={errors.email?.message}
+              {...register('email')}
+            />
+            <Input
+              label="Password"
+              type="password"
+              placeholder="Enter your password"
+              error={errors.password?.message}
+              {...register('password')}
+            />
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Logging in...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
+            </Button>
+          </form>
+        </Card>
       </div>
     </div>
   );
