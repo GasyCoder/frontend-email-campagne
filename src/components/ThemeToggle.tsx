@@ -1,24 +1,63 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTheme } from 'next-themes';
+
+const STORAGE_KEY = 'theme';
+
+function applyTheme(isDark: boolean) {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  document.documentElement.classList.toggle('dark', isDark);
+}
 
 export default function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const storedTheme = window.localStorage.getItem(STORAGE_KEY);
+    const initialIsDark = storedTheme
+      ? storedTheme === 'dark'
+      : mediaQuery.matches;
+
+    setIsDark(initialIsDark);
+    applyTheme(initialIsDark);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      if (window.localStorage.getItem(STORAGE_KEY)) {
+        return;
+      }
+
+      setIsDark(event.matches);
+      applyTheme(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
   }, []);
 
-  const currentTheme = theme === 'system' ? resolvedTheme : theme;
-  const isDark = currentTheme === 'dark';
+  const toggleTheme = () => {
+    setIsDark((previous) => {
+      const nextIsDark = !previous;
+      window.localStorage.setItem(STORAGE_KEY, nextIsDark ? 'dark' : 'light');
+      applyTheme(nextIsDark);
+      return nextIsDark;
+    });
+  };
 
   return (
     <button
       type="button"
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      onClick={toggleTheme}
       className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-slate-950"
     >
       {mounted ? (
