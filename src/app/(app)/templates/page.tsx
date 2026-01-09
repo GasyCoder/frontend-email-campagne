@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Table from '@/components/Table';
 import Modal from '@/components/Modal';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { templateSchema, TemplateInput } from '@/lib/validators';
@@ -95,13 +97,19 @@ export default function TemplatesPage() {
   };
 
   const columns = [
-    { header: 'Name', accessor: 'name' as keyof Template },
-    { 
-      header: 'Type', 
+    { header: 'Name', accessor: 'name' as keyof Template, className: 'max-w-[260px] break-words' },
+    {
+      header: 'Type',
       accessor: (t: Template) => (t.workspace_id ? 'Custom' : 'System'),
-      className: (t: Template) => t.workspace_id ? 'text-indigo-600' : 'text-gray-500'
+      className: (t: Template) =>
+        t.workspace_id
+          ? 'text-indigo-600 dark:text-indigo-300'
+          : 'text-slate-500 dark:text-slate-400',
     },
-    { header: 'Created At', accessor: (t: Template) => new Date(t.created_at).toLocaleDateString() },
+    {
+      header: 'Created At',
+      accessor: (t: Template) => new Date(t.created_at).toLocaleDateString(),
+    },
     {
       header: 'Actions',
       accessor: (t: Template) => (
@@ -111,7 +119,7 @@ export default function TemplatesPage() {
               setSelectedTemplate(t);
               setIsPreviewOpen(true);
             }}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-slate-500 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
             title="Preview"
           >
             <Eye className="h-5 w-5" />
@@ -141,24 +149,25 @@ export default function TemplatesPage() {
   ];
 
   return (
-    <div className="space-y-10 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="min-w-0 space-y-6 pb-12">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Templates</h1>
-          <p className="text-slate-500 mt-1">Manage your email designs and layouts.</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Templates</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Manage your email designs and layouts.
+          </p>
         </div>
-        <button
+        <Button
           onClick={() => {
             setError(null);
             setIsEditing(false);
             reset();
             setIsModalOpen(true);
           }}
-          className="btn-primary"
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           New Template
-        </button>
+        </Button>
       </div>
 
       <Table columns={columns} data={templates} loading={loading} />
@@ -170,41 +179,40 @@ export default function TemplatesPage() {
         title={isEditing ? 'Edit Template' : 'Create New Template'}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && <div className="p-3 bg-red-50 text-red-700 text-sm rounded-md">{error}</div>}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
-            <input
-              {...register('name')}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="e.g. Welcome Email"
-            />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">HTML Content</label>
+          {error && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-200">
+              {error}
+            </div>
+          )}
+          <Input
+            label="Name"
+            placeholder="e.g. Welcome Email"
+            error={errors.name?.message}
+            {...register('name')}
+          />
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              HTML Content
+            </label>
             <textarea
               {...register('html_body')}
               rows={12}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus-visible:ring-offset-slate-950 font-mono whitespace-pre-wrap break-words"
               placeholder="<html>...</html>"
             />
-            {errors.html_body && <p className="mt-1 text-xs text-red-600">{errors.html_body.message}</p>}
+            {errors.html_body && (
+              <p className="text-xs text-rose-600 dark:text-rose-300">
+                {errors.html_body.message}
+              </p>
+            )}
           </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="mr-3 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Saving...' : 'Save Template'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
@@ -215,10 +223,10 @@ export default function TemplatesPage() {
         onClose={() => setIsPreviewOpen(false)}
         title={`Preview: ${selectedTemplate?.name}`}
       >
-        <div className="border border-gray-200 rounded-md p-4 bg-gray-50 max-h-[600px] overflow-auto">
-          <div 
-            dangerouslySetInnerHTML={{ __html: selectedTemplate?.html_body || '' }} 
-            className="prose max-w-none"
+        <div className="max-h-[600px] overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/70">
+          <div
+            dangerouslySetInnerHTML={{ __html: selectedTemplate?.html_body || '' }}
+            className="prose max-w-none dark:prose-invert"
           />
         </div>
       </Modal>

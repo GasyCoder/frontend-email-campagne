@@ -2,11 +2,10 @@
 
 import { useEffect, useState, use } from 'react';
 import api from '@/lib/api';
-import Modal from '@/components/Modal';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { 
-  Send, 
   Users, 
-  FileText, 
   BarChart3, 
   Clock, 
   Eye, 
@@ -170,12 +169,15 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary-600 border-r-2 border-transparent"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-r-2 border-t-2 border-indigo-500 border-transparent"></div>
       </div>
     );
   }
 
-  if (!campaign) return <div className="p-8 text-center text-red-500 premium-card">Campaign not found.</div>;
+  if (!campaign)
+    return (
+      <div className="premium-card p-8 text-center text-rose-500">Campaign not found.</div>
+    );
 
   const tabs = [
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -186,64 +188,81 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
   ];
 
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div className="space-y-1">
-          <Link href="/campaigns" className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-primary-600 transition-colors mb-2 group">
-            <ChevronLeft className="h-4 w-4 mr-1 group-hover:-translate-x-0.5 transition-transform" />
+    <div className="min-w-0 space-y-6 pb-12">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 space-y-1">
+          <Link
+            href="/campaigns"
+            className="group mb-2 inline-flex items-center text-sm font-medium text-slate-400 transition-colors hover:text-indigo-600"
+          >
+            <ChevronLeft className="mr-1 h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
             Back to Campaigns
           </Link>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{campaign.name}</h1>
-            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-              campaign.status === 'sent' ? 'bg-emerald-50 text-emerald-600' : 
-              campaign.status === 'sending' ? 'bg-amber-50 text-amber-600 animate-pulse' :
-              'bg-slate-100 text-slate-500'
-            }`}>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 break-words">
+              {campaign.name}
+            </h1>
+            <span
+              className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest ${
+                campaign.status === 'sent'
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-200'
+                  : campaign.status === 'sending'
+                    ? 'bg-amber-50 text-amber-600 animate-pulse dark:bg-amber-500/20 dark:text-amber-200'
+                    : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300'
+              }`}
+            >
               {campaign.status}
             </span>
           </div>
-          <p className="text-slate-500 text-sm">Campaign ID: <span className="font-mono">{campaign.id}</span></p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Campaign ID: <span className="font-mono">{campaign.id}</span>
+          </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-3">
           {campaign.status === 'draft' && (
-            <button
-              onClick={handleSendNow}
-              disabled={submitting}
-              className="btn-primary"
-            >
-              <Zap className="mr-2 h-4 w-4 fill-white" />
+            <Button onClick={handleSendNow} disabled={submitting}>
+              <Zap className="h-4 w-4 fill-white" />
               Launch Now
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       {message && (
-        <div className={`p-4 rounded-2xl flex items-center border ${
-          message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'
-        } transition-all animate-in fade-in slide-in-from-top-4`}>
-          {message.type === 'success' ? <CheckCircle2 className="mr-3 h-5 w-5" /> : <AlertCircle className="mr-3 h-5 w-5" />}
+        <div
+          className={`flex items-center rounded-2xl border p-4 text-sm transition-all ${
+            message.type === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200'
+              : 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200'
+          }`}
+        >
+          {message.type === 'success' ? (
+            <CheckCircle2 className="mr-3 h-5 w-5" />
+          ) : (
+            <AlertCircle className="mr-3 h-5 w-5" />
+          )}
           <span className="font-medium">{message.text}</span>
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-64 space-y-1">
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="w-full space-y-1 lg:w-64">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200 ${
+                className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
                   isActive
-                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-100'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200/40'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900/70 dark:hover:text-slate-100'
                 }`}
               >
                 <div className="flex items-center">
-                  <tab.icon className={`mr-3 h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <tab.icon
+                    className={`mr-3 h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`}
+                  />
                   {tab.label}
                 </div>
               </button>
@@ -251,37 +270,45 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           })}
         </div>
 
-        <div className="flex-1">
-          <div className="premium-card p-10">
+        <div className="min-w-0 flex-1">
+          <div className="premium-card p-6 md:p-10">
             {activeTab === 'settings' && (
               <form onSubmit={handleUpdate} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div className="space-y-6">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Internal Name</label>
-                      <input name="name" defaultValue={campaign.name} className="mt-1 block w-full border-slate-200 rounded-xl shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm h-11" required />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email Subject</label>
-                      <input name="subject" defaultValue={campaign.subject} className="mt-1 block w-full border-slate-200 rounded-xl shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm h-11" required />
-                    </div>
+                    <Input
+                      label="Internal Name"
+                      name="name"
+                      defaultValue={campaign.name}
+                      required
+                    />
+                    <Input
+                      label="Email Subject"
+                      name="subject"
+                      defaultValue={campaign.subject}
+                      required
+                    />
                   </div>
                   <div className="space-y-6">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Sender Name</label>
-                      <input name="from_name" defaultValue={campaign.from_name} className="mt-1 block w-full border-slate-200 rounded-xl shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm h-11" required />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Sender Email</label>
-                      <input name="from_email" defaultValue={campaign.from_email} className="mt-1 block w-full border-slate-200 rounded-xl shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm h-11" required />
-                    </div>
+                    <Input
+                      label="Sender Name"
+                      name="from_name"
+                      defaultValue={campaign.from_name}
+                      required
+                    />
+                    <Input
+                      label="Sender Email"
+                      name="from_email"
+                      defaultValue={campaign.from_email}
+                      required
+                    />
                   </div>
                 </div>
-                <div className="pt-6 border-t border-slate-50">
-                  <button type="submit" disabled={submitting} className="btn-primary min-w-[160px]">
-                    <Save className="mr-2 h-4 w-4" />
+                <div className="border-t border-slate-100 pt-6 dark:border-slate-800">
+                  <Button type="submit" disabled={submitting} className="min-w-[160px]">
+                    <Save className="h-4 w-4" />
                     {submitting ? 'Updating...' : 'Save Settings'}
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
@@ -289,78 +316,99 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
             {activeTab === 'audience' && (
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Target Audience</h3>
-                  <p className="text-slate-500 text-sm mt-1">Select the mailing lists that will receive this campaign.</p>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                    Target Audience
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Select the mailing lists that will receive this campaign.
+                  </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {lists.map((list) => (
-                    <label key={list.id} className="flex items-center p-4 border border-slate-100 rounded-2xl hover:bg-slate-50 cursor-pointer transition-all group">
+                    <label
+                      key={list.id}
+                      className="group flex cursor-pointer items-center rounded-2xl border border-slate-200 p-4 transition-all hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900/70"
+                    >
                       <div className="relative flex items-center">
                         <input
                           type="checkbox"
                           name="lists"
                           value={list.id}
                           defaultChecked={campaign.lists.some(l => l.id === list.id)}
-                          className="h-5 w-5 text-primary-600 rounded-lg border-slate-300 focus:ring-primary-500 transition-all"
+                          className="h-5 w-5 rounded-lg border-slate-300 text-indigo-600 transition-all focus:ring-indigo-500 dark:border-slate-600"
                         />
                       </div>
-                      <div className="ml-4">
-                        <span className="text-sm font-bold text-slate-900 block group-hover:text-primary-600 transition-colors">{list.name}</span>
-                        <span className="text-xs text-slate-400">ID: {list.id}</span>
+                      <div className="ml-4 min-w-0">
+                        <span className="block text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100">
+                          {list.name}
+                        </span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">ID: {list.id}</span>
                       </div>
                     </label>
                   ))}
                 </div>
-                <div className="pt-6 border-t border-slate-50">
-                  <button onClick={handleAudienceUpdate} disabled={submitting} className="btn-primary min-w-[180px]">
+                <div className="border-t border-slate-100 pt-6 dark:border-slate-800">
+                  <Button
+                    onClick={handleAudienceUpdate}
+                    disabled={submitting}
+                    className="min-w-[180px]"
+                  >
                     Update Audience
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
 
             {activeTab === 'content' && (
               <div className="space-y-8">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Email Designer</h3>
-                    <p className="text-slate-500 text-sm mt-1">Craft your message using HTML.</p>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                      Email Designer
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                      Craft your message using HTML.
+                    </p>
                   </div>
-                  <button onClick={handlePreview} className="btn-secondary text-primary-600 border-primary-100 bg-primary-50/30">
-                    <Eye className="mr-2 h-4 w-4" />
+                  <Button variant="secondary" onClick={handlePreview}>
+                    <Eye className="h-4 w-4" />
                     Preview
-                  </button>
+                  </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                  <div className="flex flex-col space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">HTML Source Code</label>
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+                  <div className="flex flex-col space-y-4 min-w-0">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      HTML Source Code
+                    </label>
                     <textarea
                       id="html-editor"
-                      className="flex-1 w-full border-none rounded-2xl font-mono text-sm p-6 bg-slate-900 text-slate-300 min-h-[500px] focus:ring-2 focus:ring-primary-500/50 outline-none"
+                      className="min-h-[500px] w-full flex-1 rounded-2xl border border-slate-800 bg-slate-900 p-6 font-mono text-sm text-slate-100 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 whitespace-pre-wrap break-words"
                       defaultValue={campaign.html_body || ''}
                     />
-                    <button 
+                    <Button 
                       onClick={async () => {
                         const el = document.getElementById('html-editor') as HTMLTextAreaElement;
                         await api.put(`/api/v1/campaigns/${id}`, { html_body: el.value });
                         setMessage({ type: 'success', text: 'Design saved successfully.' });
                       }}
-                      className="btn-primary w-full"
+                      className="w-full"
                     >
-                      <Save className="mr-2 h-4 w-4" />
+                      <Save className="h-4 w-4" />
                       Save Design
-                    </button>
+                    </Button>
                   </div>
 
-                  <div className="flex flex-col space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Rendered Result</label>
-                    <div className="flex-1 border border-slate-100 rounded-2xl bg-slate-50/50 overflow-hidden relative min-h-[500px] shadow-inner">
+                  <div className="flex flex-col space-y-4 min-w-0">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Rendered Result
+                    </label>
+                    <div className="relative min-h-[500px] flex-1 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50 shadow-inner dark:border-slate-800 dark:bg-slate-900/70">
                       {previewHtml ? (
                         <iframe srcDoc={previewHtml} className="w-full h-full border-none" title="Live Preview" />
                       ) : (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
-                          <Layout className="h-10 w-10 mb-4 opacity-20" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                          <Layout className="mb-4 h-10 w-10 opacity-20" />
                           <p className="text-sm italic font-medium leading-relaxed">
                             Render your design to see the live preview here.
                           </p>
@@ -375,75 +423,117 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
             {activeTab === 'schedule' && (
               <div className="max-w-md space-y-8">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Delivery Schedule</h3>
-                  <p className="text-slate-500 text-sm mt-1">Pick a future date to launch your campaign.</p>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                    Delivery Schedule
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Pick a future date to launch your campaign.
+                  </p>
                 </div>
                 <form onSubmit={handleSchedule} className="space-y-6">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Target Date & Time</label>
-                    <input
-                      type="datetime-local"
-                      id="scheduled_at"
-                      defaultValue={campaign.scheduled_at ? new Date(campaign.scheduled_at).toISOString().slice(0, 16) : ''}
-                      className="mt-1 block w-full border-slate-200 rounded-xl shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm h-11"
-                      required
-                    />
-                  </div>
-                  <div className="p-4 bg-primary-50 rounded-xl text-primary-700 text-xs font-medium leading-relaxed">
+                  <Input
+                    label="Target Date & Time"
+                    type="datetime-local"
+                    id="scheduled_at"
+                    defaultValue={
+                      campaign.scheduled_at
+                        ? new Date(campaign.scheduled_at).toISOString().slice(0, 16)
+                        : ''
+                    }
+                    required
+                  />
+                  <div className="rounded-xl bg-indigo-50 p-4 text-xs font-medium leading-relaxed text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-200">
                     Note: Your campaign will enter the 'scheduled' queue and will be processed automatically.
                   </div>
-                  <button type="submit" disabled={submitting} className="btn-primary w-full">
-                    <Clock className="mr-2 h-4 w-4" />
+                  <Button type="submit" disabled={submitting} className="w-full">
+                    <Clock className="h-4 w-4" />
                     Save Schedule
-                  </button>
+                  </Button>
                 </form>
               </div>
             )}
 
             {activeTab === 'stats' && (
-              <div className="space-y-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                   {[
-                    { label: 'Recipients', value: stats?.total_messages || 0, color: 'text-slate-900', bg: 'bg-slate-50' },
-                    { label: 'Delivered', value: stats?.delivered_count || 0, color: 'text-blue-600', bg: 'bg-blue-50' },
-                    { label: 'Opened', value: stats?.opened_count || 0, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                    { label: 'Clicked', value: stats?.clicked_count || 0, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                    {
+                      label: 'Recipients',
+                      value: stats?.total_messages || 0,
+                      color: 'text-slate-900 dark:text-slate-100',
+                      bg: 'bg-slate-50 dark:bg-slate-900/70',
+                    },
+                    {
+                      label: 'Delivered',
+                      value: stats?.delivered_count || 0,
+                      color: 'text-blue-600 dark:text-blue-200',
+                      bg: 'bg-blue-50 dark:bg-blue-500/10',
+                    },
+                    {
+                      label: 'Opened',
+                      value: stats?.opened_count || 0,
+                      color: 'text-emerald-600 dark:text-emerald-200',
+                      bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+                    },
+                    {
+                      label: 'Clicked',
+                      value: stats?.clicked_count || 0,
+                      color: 'text-indigo-600 dark:text-indigo-200',
+                      bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+                    },
                   ].map((s) => (
-                    <div key={s.label} className={`p-6 rounded-2xl border border-slate-100 ${s.bg}`}>
-                      <p className="text-2xl font-black text-slate-900">{s.value}</p>
-                      <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${s.color}`}>{s.label}</p>
+                    <div
+                      key={s.label}
+                      className={`rounded-2xl border border-slate-200 p-4 dark:border-slate-800 md:p-6 ${s.bg}`}
+                    >
+                      <p className="text-2xl font-semibold">{s.value}</p>
+                      <p className={`mt-1 text-[10px] font-semibold uppercase tracking-widest ${s.color}`}>
+                        {s.label}
+                      </p>
                     </div>
                   ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
                   <div className="space-y-6">
-                    <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Growth Metrics</h4>
+                    <h4 className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                      Growth Metrics
+                    </h4>
                     <div className="space-y-6">
                       <div>
-                        <div className="flex justify-between text-sm mb-2 font-bold">
-                          <span className="text-slate-600">Open Rate</span>
-                          <span className="text-emerald-600">{stats?.open_rate || 0}%</span>
+                        <div className="mb-2 flex justify-between text-sm font-semibold">
+                          <span className="text-slate-600 dark:text-slate-300">Open Rate</span>
+                          <span className="text-emerald-600 dark:text-emerald-200">
+                            {stats?.open_rate || 0}%
+                          </span>
                         </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2">
-                          <div className="bg-emerald-500 h-2 rounded-full transition-all duration-1000" style={{ width: `${stats?.open_rate || 0}%` }}></div>
+                        <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+                          <div
+                            className="h-2 rounded-full bg-emerald-500 transition-all duration-1000"
+                            style={{ width: `${stats?.open_rate || 0}%` }}
+                          ></div>
                         </div>
                       </div>
                       <div>
-                        <div className="flex justify-between text-sm mb-2 font-bold">
-                          <span className="text-slate-600">Click Rate</span>
-                          <span className="text-indigo-600">{stats?.click_rate || 0}%</span>
+                        <div className="mb-2 flex justify-between text-sm font-semibold">
+                          <span className="text-slate-600 dark:text-slate-300">Click Rate</span>
+                          <span className="text-indigo-600 dark:text-indigo-200">
+                            {stats?.click_rate || 0}%
+                          </span>
                         </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2">
-                          <div className="bg-indigo-500 h-2 rounded-full transition-all duration-1000" style={{ width: `${stats?.click_rate || 0}%` }}></div>
+                        <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+                          <div
+                            className="h-2 rounded-full bg-indigo-500 transition-all duration-1000"
+                            style={{ width: `${stats?.click_rate || 0}%` }}
+                          ></div>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="p-8 bg-slate-50 rounded-3xl flex flex-col justify-center text-center">
-                    <BarChart3 className="h-10 w-10 text-slate-300 mx-auto mb-4" />
-                    <p className="text-sm text-slate-500 italic font-medium">
+                  <div className="flex flex-col justify-center rounded-3xl bg-slate-50 p-8 text-center dark:bg-slate-900/70">
+                    <BarChart3 className="mx-auto mb-4 h-10 w-10 text-slate-300" />
+                    <p className="text-sm font-medium italic text-slate-500 dark:text-slate-400">
                       Real-time analytics for your campaign are being gathered.
                     </p>
                   </div>
