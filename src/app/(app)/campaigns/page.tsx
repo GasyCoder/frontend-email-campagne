@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Table from '@/components/Table';
 import Modal from '@/components/Modal';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { campaignSchema, CampaignInput } from '@/lib/validators';
-import { Plus, Eye, Send, BarChart3, Clock } from 'lucide-react';
+import { Plus, Eye } from 'lucide-react';
 import Link from 'next/link';
 
 interface Campaign {
@@ -85,22 +87,24 @@ export default function CampaignsPage() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      draft: 'bg-gray-100 text-gray-800',
-      scheduled: 'bg-blue-100 text-blue-800',
-      sending: 'bg-yellow-100 text-yellow-800',
-      sent: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
+      draft: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+      scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200',
+      sending: 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200',
+      sent: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-200',
+      failed: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-200',
     };
     return (
-      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colors[status] || colors.draft}`}>
+      <span
+        className={`inline-flex rounded-full px-2 text-xs font-semibold uppercase tracking-wide ${colors[status] || colors.draft}`}
+      >
         {status}
       </span>
     );
   };
 
   const columns = [
-    { header: 'Name', accessor: 'name' as keyof Campaign },
-    { header: 'Subject', accessor: 'subject' as keyof Campaign },
+    { header: 'Name', accessor: 'name' as keyof Campaign, className: 'max-w-[220px] break-words' },
+    { header: 'Subject', accessor: 'subject' as keyof Campaign, className: 'max-w-[260px] break-words' },
     { header: 'Status', accessor: (c: Campaign) => getStatusBadge(c.status) },
     { header: 'Created At', accessor: (c: Campaign) => new Date(c.created_at).toLocaleDateString() },
     {
@@ -121,34 +125,35 @@ export default function CampaignsPage() {
   ];
 
   return (
-    <div className="space-y-10 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="min-w-0 space-y-6 pb-12">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Campaigns</h1>
-          <p className="text-slate-500 mt-1">Create and monitor your email marketing campaigns.</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Campaigns</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Create and monitor your email marketing campaigns.
+          </p>
         </div>
-        <button
+        <Button
           onClick={() => {
             setError(null);
             reset();
             setIsModalOpen(true);
           }}
-          className="btn-primary"
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           New Campaign
-        </button>
+        </Button>
       </div>
 
-      <div className="flex space-x-4 mb-4">
+      <div className="flex flex-wrap gap-2">
         {['', 'draft', 'scheduled', 'sending', 'sent', 'failed'].map((status) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-              statusFilter === status 
-                ? 'bg-indigo-600 text-white' 
-                : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+            className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
+              statusFilter === status
+                ? 'border-indigo-500 bg-indigo-600 text-white'
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-slate-800'
             }`}
           >
             {status === '' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
@@ -165,50 +170,44 @@ export default function CampaignsPage() {
         title="Create New Campaign"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && <div className="p-3 bg-red-50 text-red-700 text-sm rounded-md">{error}</div>}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Campaign Name</label>
-            <input
-              {...register('name')}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="e.g. Winter Sale 2026"
-            />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email Subject</label>
-            <input
-              {...register('subject')}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Don't miss our deals!"
-            />
-            {errors.subject && <p className="mt-1 text-xs text-red-600">{errors.subject.message}</p>}
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">From Name</label>
-              <input
-                {...register('from_name')}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Marketing Team"
-              />
-              {errors.from_name && <p className="mt-1 text-xs text-red-600">{errors.from_name.message}</p>}
+          {error && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-200">
+              {error}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">From Email</label>
-              <input
-                {...register('from_email')}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="news@company.com"
-              />
-              {errors.from_email && <p className="mt-1 text-xs text-red-600">{errors.from_email.message}</p>}
-            </div>
+          )}
+          <Input
+            label="Campaign Name"
+            placeholder="e.g. Winter Sale 2026"
+            error={errors.name?.message}
+            {...register('name')}
+          />
+          <Input
+            label="Email Subject"
+            placeholder="Don't miss our deals!"
+            error={errors.subject?.message}
+            {...register('subject')}
+          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Input
+              label="From Name"
+              placeholder="Marketing Team"
+              error={errors.from_name?.message}
+              {...register('from_name')}
+            />
+            <Input
+              label="From Email"
+              placeholder="news@company.com"
+              error={errors.from_email?.message}
+              {...register('from_email')}
+            />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Starting Template (Optional)</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              Starting Template (Optional)
+            </label>
             <select
               {...register('template_id', { valueAsNumber: true })}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus-visible:ring-offset-slate-950"
             >
               <option value="">None</option>
               {templates.map((t) => (
@@ -218,21 +217,13 @@ export default function CampaignsPage() {
               ))}
             </select>
           </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="mr-3 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Creating...' : 'Create & Design'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>

@@ -16,7 +16,7 @@ export function TableContainer({ className, ...props }: HTMLAttributes<HTMLDivEl
 export function Table({ className, ...props }: TableHTMLAttributes<HTMLTableElement>) {
   return (
     <div className="w-full overflow-x-auto">
-      <table className={cn('w-full text-sm', className)} {...props} />
+      <table className={cn('min-w-[900px] w-full text-sm', className)} {...props} />
     </div>
   );
 }
@@ -24,7 +24,10 @@ export function Table({ className, ...props }: TableHTMLAttributes<HTMLTableElem
 export function TableHead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={cn('bg-slate-50 text-left text-xs uppercase text-slate-500 dark:bg-slate-900/80 dark:text-slate-400', className)}
+      className={cn(
+        'bg-slate-50 text-left text-xs uppercase text-slate-500 dark:bg-slate-900/80 dark:text-slate-400',
+        className
+      )}
       {...props}
     />
   );
@@ -40,7 +43,12 @@ export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowEle
 }
 
 export function TableCell({ className, ...props }: HTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn('px-4 py-3 text-slate-700 dark:text-slate-200', className)} {...props} />;
+  return (
+    <td
+      className={cn('px-4 py-3 text-slate-700 dark:text-slate-200 whitespace-normal break-words', className)}
+      {...props}
+    />
+  );
 }
 
 export function TableHeaderCell({ className, ...props }: HTMLAttributes<HTMLTableCellElement>) {

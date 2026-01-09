@@ -46,7 +46,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-500">Welcome back</p>
-          <h1 className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="mt-3 text-2xl font-semibold text-slate-900 dark:text-slate-100">
             Sign in to your account
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">

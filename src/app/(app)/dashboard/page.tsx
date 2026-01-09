@@ -55,7 +55,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary-600 border-r-2 border-transparent"></div>
+        <div className="h-10 w-10 animate-spin rounded-full border-r-2 border-t-2 border-indigo-500 border-transparent"></div>
       </div>
     );
   }
@@ -102,13 +102,15 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-10 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="min-w-0 space-y-6 pb-12">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Overview</h1>
-          <p className="text-slate-500 mt-1">Welcome back! Here's what's happening with your campaigns.</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Overview</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Welcome back! Here's what's happening with your campaigns.
+          </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Link href="/contacts" className="btn-secondary">
             <Upload className="mr-2 h-4 w-4" />
             Import
@@ -132,7 +134,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm font-medium text-slate-500">{item.name}</p>
               <div className="flex items-baseline space-x-2 mt-1">
-                <h3 className="text-2xl font-bold text-slate-900">{item.value}</h3>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{item.value}</h3>
                 {item.total && (
                   <span className="text-sm text-slate-400">/ {item.total}</span>
                 )}
@@ -158,50 +160,62 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 premium-card p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold text-slate-900">Recent Campaigns</h2>
-            <Link href="/campaigns" className="text-sm font-semibold text-primary-600 hover:text-primary-700 flex items-center">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="premium-card p-6 lg:col-span-2 md:p-8">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Recent Campaigns
+            </h2>
+            <Link
+              href="/campaigns"
+              className="flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+            >
               View all
               <ArrowUpRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-900">
               <Mail className="h-8 w-8 text-slate-300" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900">No recent campaigns</h3>
-            <p className="text-slate-500 max-w-xs mt-2">Start your marketing journey by creating your first campaign.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              No recent campaigns
+            </h3>
+            <p className="mt-2 max-w-xs text-sm text-slate-500 dark:text-slate-400">
+              Start your marketing journey by creating your first campaign.
+            </p>
             <Link href="/campaigns" className="mt-6 btn-primary">
               Launch Campaign
             </Link>
           </div>
         </div>
 
-        <div className="premium-card p-8 bg-primary-900 text-white border-none shadow-xl shadow-primary-200">
-          <div className="h-12 w-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
-            <CreditCard className="h-6 w-6 text-primary-200" />
+        <div className="premium-card border-none bg-indigo-900 p-6 text-white shadow-xl shadow-indigo-200 md:p-8">
+          <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
+            <CreditCard className="h-6 w-6 text-indigo-200" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">Upgrade to Pro</h2>
-          <p className="text-primary-100 text-sm leading-relaxed mb-8">
+          <h2 className="mb-2 text-lg font-semibold">Upgrade to Pro</h2>
+          <p className="mb-8 text-sm leading-relaxed text-indigo-100">
             Get 10,000+ credits, priority delivery, and advanced analytics to scale your business.
           </p>
-          <button className="w-full py-3 bg-white text-primary-900 font-bold rounded-xl transition-transform hover:scale-[1.03] active:scale-[0.97]">
+          <button className="w-full rounded-xl bg-white py-3 font-bold text-indigo-900 transition-transform hover:scale-[1.03] active:scale-[0.97]">
             View Pricing
           </button>
-          <div className="mt-8 pt-8 border-t border-white/10 flex items-center justify-between">
+          <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-8">
             <div className="flex -space-x-2">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-8 w-8 rounded-full border-2 border-primary-900 bg-primary-800 flex items-center justify-center text-[10px] font-bold">
+                <div
+                  key={i}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-indigo-900 bg-indigo-800 text-[10px] font-bold"
+                >
                   {i}
                 </div>
               ))}
-              <div className="h-8 w-8 rounded-full border-2 border-primary-900 bg-primary-700 flex items-center justify-center text-[10px] font-bold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-indigo-900 bg-indigo-700 text-[10px] font-bold">
                 +42
               </div>
             </div>
-            <span className="text-xs text-primary-200">Joined Pro this week</span>
+            <span className="text-xs text-indigo-200">Joined Pro this week</span>
           </div>
         </div>
       </div>

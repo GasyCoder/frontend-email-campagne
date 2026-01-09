@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Table from '@/components/Table';
 import Modal from '@/components/Modal';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { listSchema, ListInput } from '@/lib/validators';
@@ -112,8 +114,12 @@ export default function ListsPage() {
   };
 
   const columns = [
-    { header: 'Name', accessor: 'name' as keyof List },
-    { header: 'Description', accessor: (l: List) => l.description || '-' },
+    { header: 'Name', accessor: 'name' as keyof List, className: 'max-w-[200px] break-words' },
+    {
+      header: 'Description',
+      accessor: (l: List) => l.description || '-',
+      className: 'max-w-[320px] break-words',
+    },
     { header: 'Contacts', accessor: (l: List) => l.contacts_count ?? 0 },
     {
       header: 'Actions',
@@ -143,23 +149,24 @@ export default function ListsPage() {
   ];
 
   return (
-    <div className="space-y-10 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="min-w-0 space-y-6 pb-12">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Lists</h1>
-          <p className="text-slate-500 mt-1">Organize your contacts into segments.</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Lists</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Organize your contacts into segments.
+          </p>
         </div>
-        <button
+        <Button
           onClick={() => {
             setError(null);
             reset();
             setIsModalOpen(true);
           }}
-          className="btn-primary"
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           New List
-        </button>
+        </Button>
       </div>
 
       <Table columns={columns} data={lists} loading={loading} />
@@ -171,39 +178,34 @@ export default function ListsPage() {
         title="Create New List"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && <div className="p-3 bg-red-50 text-red-700 text-sm rounded-md">{error}</div>}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
-            <input
-              {...register('name')}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="e.g. Newsletter Subscribers"
-            />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+          {error && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-200">
+              {error}
+            </div>
+          )}
+          <Input
+            label="Name"
+            placeholder="e.g. Newsletter Subscribers"
+            error={errors.name?.message}
+            {...register('name')}
+          />
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
+              Description
+            </label>
             <textarea
               {...register('description')}
               rows={3}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:ring-offset-slate-950"
             />
           </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="mr-3 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Creating...' : 'Create List'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
@@ -215,13 +217,18 @@ export default function ListsPage() {
         title="Add Contacts to List"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-500">Select contacts to add to this list.</p>
-          <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md divide-y">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Select contacts to add to this list.
+          </p>
+          <div className="max-h-60 divide-y overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
             {contacts.map((contact) => (
-              <label key={contact.id} className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer">
+              <label
+                key={contact.id}
+                className="flex cursor-pointer items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-900/70"
+              >
                 <input
                   type="checkbox"
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600"
                   checked={selectedContacts.includes(contact.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
@@ -231,30 +238,27 @@ export default function ListsPage() {
                     }
                   }}
                 />
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900">{contact.email}</p>
-                  <p className="text-xs text-gray-500">
+                <div className="ml-3 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100 break-words">
+                    {contact.email}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {contact.first_name} {contact.last_name}
                   </p>
                 </div>
               </label>
             ))}
           </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsBulkOpen(false)}
-              className="mr-3 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button variant="secondary" onClick={() => setIsBulkOpen(false)}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleBulkAdd}
               disabled={submitting || selectedContacts.length === 0}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
             >
               {submitting ? 'Adding...' : `Add ${selectedContacts.length} Contacts`}
-            </button>
+            </Button>
           </div>
         </div>
       </Modal>

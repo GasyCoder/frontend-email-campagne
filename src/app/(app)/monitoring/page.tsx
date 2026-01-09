@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Table from '@/components/Table';
 import Pagination from '@/components/Pagination';
+import Button from '@/components/ui/Button';
 import { Search, Filter, RefreshCw } from 'lucide-react';
 
 interface Message {
@@ -58,63 +59,89 @@ export default function MonitoringPage() {
 
   const getStatusBadge = (s: string) => {
     const colors: Record<string, string> = {
-      pending: 'bg-gray-100 text-gray-800',
-      sent: 'bg-blue-100 text-blue-800',
-      delivered: 'bg-green-100 text-green-800',
-      opened: 'bg-indigo-100 text-indigo-800',
-      clicked: 'bg-purple-100 text-purple-800',
-      failed: 'bg-red-100 text-red-800',
-      bounced: 'bg-orange-100 text-orange-800',
+      pending: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+      sent: 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200',
+      delivered: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-200',
+      opened: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-200',
+      clicked: 'bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-200',
+      failed: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-200',
+      bounced: 'bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-200',
     };
     return (
-      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colors[s] || 'bg-gray-100'}`}>
+      <span
+        className={`inline-flex rounded-full px-2 text-xs font-semibold uppercase tracking-wide ${colors[s] || colors.pending}`}
+      >
         {s}
       </span>
     );
   };
 
   const columns = [
-    { header: 'Recipient', accessor: 'recipient_email' as keyof Message },
-    { header: 'Campaign', accessor: (m: Message) => m.campaign_name || 'N/A' },
+    {
+      header: 'Recipient',
+      accessor: 'recipient_email' as keyof Message,
+      className: 'max-w-[220px] break-words',
+    },
+    {
+      header: 'Campaign',
+      accessor: (m: Message) => m.campaign_name || 'N/A',
+      className: 'max-w-[220px] break-words',
+    },
     { header: 'Status', accessor: (m: Message) => getStatusBadge(m.status) },
-    { header: 'Processed At', accessor: (m: Message) => m.sent_at ? new Date(m.sent_at).toLocaleString() : '-' },
-    { 
-      header: 'Error', 
-      accessor: (m: Message) => m.error_message ? <span className="text-red-500 truncate max-w-xs block text-xs" title={m.error_message}>{m.error_message}</span> : '-' 
+    {
+      header: 'Processed At',
+      accessor: (m: Message) => (m.sent_at ? new Date(m.sent_at).toLocaleString() : '-'),
+    },
+    {
+      header: 'Error',
+      accessor: (m: Message) =>
+        m.error_message ? (
+          <span
+            className="block max-w-xs break-words text-xs text-rose-500"
+            title={m.error_message}
+          >
+            {m.error_message}
+          </span>
+        ) : (
+          '-'
+        ),
     },
   ];
 
   return (
-    <div className="space-y-10 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="min-w-0 space-y-6 pb-12">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Monitoring</h1>
-          <p className="text-slate-500 mt-1">Track delivery and engagement for every message sent.</p>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Monitoring</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Track delivery and engagement for every message sent.
+          </p>
         </div>
-        <button 
-          onClick={() => fetchMessages()} 
-          className="btn-secondary rounded-full! p-2.5"
+        <Button
+          variant="secondary"
+          onClick={() => fetchMessages()}
+          className="h-10 w-10 rounded-full p-0"
           title="Refresh"
         >
           <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-        </button>
+        </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 bg-white p-4 shadow rounded-lg">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Search email or campaign..."
-            className="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="block w-full rounded-xl border border-slate-200 bg-white py-2 pl-10 pr-3 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:ring-offset-slate-950"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-gray-400" />
+        <div className="flex min-w-0 items-center gap-2">
+          <Filter className="h-4 w-4 text-slate-400" />
           <select
-            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="block w-full min-w-[160px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus-visible:ring-offset-slate-950"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
